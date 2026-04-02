@@ -42,10 +42,9 @@
         <div class="card border stat-card">
             <div class="card-body py-2 px-3">
                 <div class="text-uppercase small text-body-secondary" style="font-size:.7rem">
-                    <i class="bi bi-geo-alt"></i> Suchgebiet
+                    <i class="bi bi-geo-alt"></i> Suchgebiet (Radius {{ search.rad | int }} km)
                 </div>
                 <div class="fw-bold" style="font-size:.85rem">{{ search.lat }}°, {{ search.lng }}°</div>
-                <div class="text-body-secondary" style="font-size:.75rem">Radius {{ search.rad }} km</div>
             </div>
         </div>
     </div>
