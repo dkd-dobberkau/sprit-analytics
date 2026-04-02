@@ -1,0 +1,57 @@
+{% set prices = prices | default(cheapest, true) %}
+{% set fuel = fuel | default("diesel", true) %}
+{% set fuel_labels = {"diesel": "Diesel", "e5": "Super E5", "e10": "Super E10"} %}
+
+{% if prices %}
+<div class="table-responsive">
+    <table class="table table-hover align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>#</th>
+                <th>Tankstelle</th>
+                <th>Ort</th>
+                <th class="text-end">Diesel</th>
+                <th class="text-end">E5</th>
+                <th class="text-end">E10</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in prices %}
+            <tr>
+                <td class="text-body-secondary">{{ loop.index }}</td>
+                <td>
+                    <span class="badge bg-secondary me-1">{{ p.brand or '?' }}</span>
+                    {{ p.name }}
+                </td>
+                <td class="text-body-secondary">{{ p.place or '' }}</td>
+                <td class="text-end {% if fuel == 'diesel' %}fw-bold text-success{% endif %}">
+                    {% if p.diesel %}{{ "%.3f"|format(p.diesel) }} €{% else %}—{% endif %}
+                </td>
+                <td class="text-end {% if fuel == 'e5' %}fw-bold text-success{% endif %}">
+                    {% if p.e5 %}{{ "%.3f"|format(p.e5) }} €{% else %}—{% endif %}
+                </td>
+                <td class="text-end {% if fuel == 'e10' %}fw-bold text-success{% endif %}">
+                    {% if p.e10 %}{{ "%.3f"|format(p.e10) }} €{% else %}—{% endif %}
+                </td>
+                <td>
+                    <button class="btn btn-sm btn-outline-primary"
+                            hx-get="/api/station/{{ p.station_ref | station_id }}/history"
+                            hx-target="#history-content"
+                            data-bs-toggle="modal"
+                            data-bs-target="#historyModal"
+                            title="Preisverlauf">
+                        <i class="bi bi-graph-up"></i>
+                    </button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="text-center text-body-secondary py-5">
+    <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+    Keine Preisdaten vorhanden. Starte zuerst den Collector.
+</div>
+{% endif %}

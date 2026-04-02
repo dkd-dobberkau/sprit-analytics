@@ -1,0 +1,152 @@
+{% extends "layouts/base.html" %}
+{% block title %}Dashboard — Sprit Analytics{% endblock %}
+
+{% block content %}
+<!-- Stats -->
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card text-bg-primary">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-uppercase small opacity-75">Tankstellen</div>
+                        <div class="fs-2 fw-bold">{{ station_count }}</div>
+                    </div>
+                    <i class="bi bi-fuel-pump fs-1 opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-bg-success">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-uppercase small opacity-75">Letzter Durchlauf</div>
+                        <div class="fs-2 fw-bold">
+                            {% if last_run %}{{ last_run.events_written }}{% else %}—{% endif %}
+                        </div>
+                        <div class="small opacity-75">Events</div>
+                    </div>
+                    <i class="bi bi-arrow-repeat fs-1 opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-bg-warning">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-uppercase small opacity-75">Status</div>
+                        <div class="fs-4 fw-bold">
+                            {% if last_run and not last_run.error %}
+                                <i class="bi bi-check-circle"></i> OK
+                            {% elif last_run and last_run.error %}
+                                <i class="bi bi-exclamation-triangle"></i> Fehler
+                            {% else %}
+                                <i class="bi bi-question-circle"></i> Kein Lauf
+                            {% endif %}
+                        </div>
+                    </div>
+                    <i class="bi bi-activity fs-1 opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tabs -->
+<ul class="nav nav-tabs mb-3" role="tablist">
+    <li class="nav-item">
+        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-prices">
+            <i class="bi bi-graph-down me-1"></i>Preisvergleich
+        </button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-search">
+            <i class="bi bi-search me-1"></i>Tankstellen suchen
+        </button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-runs"
+                hx-get="/api/collector/runs"
+                hx-target="#runs-content"
+                hx-trigger="click once">
+            <i class="bi bi-clock-history me-1"></i>Collector Runs
+        </button>
+    </li>
+</ul>
+
+<div class="tab-content">
+    <!-- Preisvergleich -->
+    <div class="tab-pane fade show active" id="tab-prices">
+        <div class="btn-group mb-3" role="group">
+            <button class="btn btn-outline-primary active"
+                    hx-get="/api/prices/cheapest?fuel=diesel"
+                    hx-target="#price-results"
+                    hx-swap="innerHTML"
+                    onclick="setActiveBtn(this)">Diesel</button>
+            <button class="btn btn-outline-primary"
+                    hx-get="/api/prices/cheapest?fuel=e5"
+                    hx-target="#price-results"
+                    hx-swap="innerHTML"
+                    onclick="setActiveBtn(this)">Super E5</button>
+            <button class="btn btn-outline-primary"
+                    hx-get="/api/prices/cheapest?fuel=e10"
+                    hx-target="#price-results"
+                    hx-swap="innerHTML"
+                    onclick="setActiveBtn(this)">Super E10</button>
+        </div>
+        <div id="price-results">
+            {% include "components/price_table.html" %}
+        </div>
+    </div>
+
+    <!-- Suche -->
+    <div class="tab-pane fade" id="tab-search">
+        <div class="mb-3">
+            <input type="search"
+                   class="form-control form-control-lg"
+                   placeholder="Tankstelle, Marke oder Ort suchen..."
+                   name="q"
+                   hx-get="/api/stations/search"
+                   hx-trigger="input changed delay:300ms, search"
+                   hx-target="#search-results"
+                   hx-indicator="#search-spinner">
+            <div id="search-spinner" class="htmx-indicator text-center py-3">
+                <div class="spinner-border spinner-border-sm text-primary"></div>
+                <span class="ms-2">Suche...</span>
+            </div>
+        </div>
+        <div id="search-results"></div>
+    </div>
+
+    <!-- Collector Runs -->
+    <div class="tab-pane fade" id="tab-runs">
+        <div id="runs-content">
+            <div class="text-center text-body-secondary py-4">
+                <i class="bi bi-clock-history fs-3 d-block mb-2"></i>
+                Klicke auf den Tab um die Runs zu laden.
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal für Preisverlauf -->
+<div class="modal fade" id="historyModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Preisverlauf</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="history-content">
+                <div class="text-center py-4">
+                    <div class="spinner-border"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,58 @@
+services:
+  surrealdb:
+    image: surrealdb/surrealdb:latest
+    container_name: sprit-surrealdb
+    user: root
+    ports:
+      - "8000:8000"
+    volumes:
+      - surreal-data:/data
+    command: start --log info --user root --pass root surrealkv:/data/tk.db
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "/surreal", "is-ready", "--endpoint", "http://localhost:8000"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+    networks:
+      - sprit-net
+
+  web:
+    build: .
+    container_name: sprit-web
+    ports:
+      - "5001:5001"
+    env_file:
+      - .env
+    environment:
+      - SURREAL_URL=ws://surrealdb:8000/rpc
+    depends_on:
+      surrealdb:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - sprit-net
+
+  collector:
+    build: .
+    container_name: sprit-collector
+    entrypoint: ["python", "collector.py"]
+    env_file:
+      - .env
+    environment:
+      - SURREAL_URL=ws://surrealdb:8000/rpc
+    depends_on:
+      surrealdb:
+        condition: service_healthy
+    profiles:
+      - collect
+    networks:
+      - sprit-net
+
+volumes:
+  surreal-data:
+
+networks:
+  sprit-net:
+    driver: bridge

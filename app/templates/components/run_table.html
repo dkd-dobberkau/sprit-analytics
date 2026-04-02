@@ -1,0 +1,49 @@
+{% if runs %}
+<div class="table-responsive">
+    <table class="table table-sm table-hover">
+        <thead class="table-light">
+            <tr>
+                <th>Gestartet</th>
+                <th>Dauer</th>
+                <th class="text-end">Stationen</th>
+                <th class="text-end">Events</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in runs %}
+            <tr>
+                <td>
+                    <code>{{ r.started_at.strftime('%d.%m.%Y %H:%M') if r.started_at is not none and r.started_at.strftime is defined else r.started_at }}</code>
+                </td>
+                <td class="text-body-secondary">
+                    {% if r.finished_at and r.started_at %}
+                        {% set dur = (r.finished_at - r.started_at).total_seconds() if r.finished_at.total_seconds is not defined else 0 %}
+                        {{ "%.1f"|format(dur) }}s
+                    {% else %}
+                        —
+                    {% endif %}
+                </td>
+                <td class="text-end">{{ r.stations_seen or '—' }}</td>
+                <td class="text-end">{{ r.events_written or '—' }}</td>
+                <td>
+                    {% if r.error %}
+                        <span class="badge bg-danger" title="{{ r.error }}">
+                            <i class="bi bi-x-circle"></i> Fehler
+                        </span>
+                    {% else %}
+                        <span class="badge bg-success">
+                            <i class="bi bi-check-circle"></i> OK
+                        </span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="text-center text-body-secondary py-4">
+    Keine Collector-Runs vorhanden.
+</div>
+{% endif %}

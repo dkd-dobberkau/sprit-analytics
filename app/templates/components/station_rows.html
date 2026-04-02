@@ -1,0 +1,35 @@
+{% if stations %}
+<div class="list-group">
+    {% for s in stations %}
+    <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+        <div>
+            <span class="badge bg-secondary me-2">{{ s.brand or '?' }}</span>
+            <strong>{{ s.name }}</strong>
+            <br>
+            <small class="text-body-secondary">
+                {{ s.street }} {{ s.house_number or '' }}, {{ s.post_code }} {{ s.place }}
+            </small>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            {% if s.is_open %}
+                <span class="badge bg-success">Offen</span>
+            {% else %}
+                <span class="badge bg-danger">Geschlossen</span>
+            {% endif %}
+            <button class="btn btn-sm btn-outline-primary"
+                    hx-get="/api/station/{{ s.id | station_id }}/history"
+                    hx-target="#history-content"
+                    data-bs-toggle="modal"
+                    data-bs-target="#historyModal">
+                <i class="bi bi-graph-up"></i>
+            </button>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% elif stations is defined %}
+<div class="text-center text-body-secondary py-4">
+    <i class="bi bi-search fs-3 d-block mb-2"></i>
+    Keine Ergebnisse. Versuche einen anderen Suchbegriff.
+</div>
+{% endif %}
