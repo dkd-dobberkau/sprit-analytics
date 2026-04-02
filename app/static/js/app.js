@@ -68,10 +68,74 @@ function initSortable(table) {
     });
 }
 
+// Price chart rendering
+let currentChart = null;
+
+function renderPriceChart() {
+    const canvas = document.getElementById('priceChart');
+    if (!canvas || !canvas.dataset.events) return;
+
+    if (currentChart) {
+        currentChart.destroy();
+        currentChart = null;
+    }
+
+    const events = JSON.parse(canvas.dataset.events);
+    const ctx = canvas.getContext('2d');
+
+    const labels = events.map(e => {
+        const d = new Date(e.fetched_at);
+        return d.toLocaleString('de-DE', {day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'});
+    });
+
+    const datasets = [];
+    const colors = {diesel: '#198754', e5: '#0d6efd', e10: '#fd7e14'};
+    const names = {diesel: 'Diesel', e5: 'Super E5', e10: 'Super E10'};
+
+    for (const fuel of ['diesel', 'e5', 'e10']) {
+        const data = events.map(e => e[fuel]);
+        if (data.some(v => v !== null && v !== undefined)) {
+            datasets.push({
+                label: names[fuel],
+                data: data,
+                borderColor: colors[fuel],
+                backgroundColor: colors[fuel] + '20',
+                tension: 0.3,
+                pointRadius: 3,
+                fill: true,
+            });
+        }
+    }
+
+    currentChart = new Chart(ctx, {
+        type: 'line',
+        data: { labels, datasets },
+        options: {
+            responsive: true,
+            interaction: { intersect: false, mode: 'index' },
+            scales: {
+                y: { ticks: { callback: v => v.toFixed(3) + ' €' } }
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: item => item.dataset.label + ': ' + item.raw.toFixed(3) + ' €'
+                    }
+                }
+            }
+        }
+    });
+}
+
 // Init on load and after HTMX swaps
 function initAllSortables() {
     document.querySelectorAll('.sortable-table').forEach(initSortable);
 }
 
-document.addEventListener('DOMContentLoaded', initAllSortables);
-document.addEventListener('htmx:afterSwap', initAllSortables);
+function onSwap() {
+    initAllSortables();
+    renderPriceChart();
+}
+
+document.addEventListener('DOMContentLoaded', onSwap);
+document.addEventListener('htmx:afterSwap', onSwap);
