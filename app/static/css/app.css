@@ -8,7 +8,7 @@
 .htmx-settling { opacity: 1; transition: opacity 0.15s ease-in; }
 
 /* Stat cards compact */
-.stat-card { transition: transform 0.15s ease; }
+.stat-card { transition: transform 0.15s ease; height: 100%; }
 .stat-card:hover { transform: translateY(-1px); }
 
 /* Sortable table headers */
