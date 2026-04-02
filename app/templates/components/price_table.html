@@ -1,38 +1,50 @@
 {% set prices = prices | default(cheapest, true) %}
 {% set fuel = fuel | default("diesel", true) %}
-{% set fuel_labels = {"diesel": "Diesel", "e5": "Super E5", "e10": "Super E10"} %}
 
 {% if prices %}
 <div class="table-responsive">
-    <table class="table table-hover align-middle">
+    <table class="table table-hover align-middle sortable-table" id="priceTable">
         <thead class="table-light">
             <tr>
-                <th>#</th>
-                <th>Tankstelle</th>
-                <th>Ort</th>
-                <th class="text-end">Diesel</th>
-                <th class="text-end">E5</th>
-                <th class="text-end">E10</th>
-                <th></th>
+                <th class="text-body-secondary" style="width:2rem">#</th>
+                <th class="sortable" data-sort="text" data-col="1" role="button">
+                    Tankstelle <i class="bi bi-chevron-expand sort-icon"></i>
+                </th>
+                <th class="sortable" data-sort="text" data-col="2" role="button">
+                    Ort <i class="bi bi-chevron-expand sort-icon"></i>
+                </th>
+                <th class="sortable text-end" data-sort="num" data-col="3" role="button">
+                    Diesel <i class="bi bi-chevron-expand sort-icon"></i>
+                </th>
+                <th class="sortable text-end" data-sort="num" data-col="4" role="button">
+                    E5 <i class="bi bi-chevron-expand sort-icon"></i>
+                </th>
+                <th class="sortable text-end" data-sort="num" data-col="5" role="button">
+                    E10 <i class="bi bi-chevron-expand sort-icon"></i>
+                </th>
+                <th style="width:2.5rem"></th>
             </tr>
         </thead>
         <tbody>
             {% for p in prices %}
             <tr>
-                <td class="text-body-secondary">{{ loop.index }}</td>
-                <td>
+                <td class="text-body-secondary row-num">{{ loop.index }}</td>
+                <td data-value="{{ p.brand or '' }} {{ p.name }}">
                     <span class="badge bg-secondary me-1">{{ p.brand or '?' }}</span>
                     {{ p.name }}
                 </td>
-                <td class="text-body-secondary">{{ p.place or '' }}</td>
-                <td class="text-end {% if fuel == 'diesel' %}fw-bold text-success{% endif %}">
-                    {% if p.diesel %}{{ "%.3f"|format(p.diesel) }} €{% else %}—{% endif %}
+                <td class="text-body-secondary" data-value="{{ p.place or '' }}">{{ p.place or '' }}</td>
+                <td class="text-end {% if fuel == 'diesel' %}fw-bold text-success{% endif %}"
+                    data-value="{{ p.diesel if p.diesel else 9999 }}">
+                    {% if p.diesel %}{{ "%.3f"|format(p.diesel) }}&nbsp;€{% else %}—{% endif %}
                 </td>
-                <td class="text-end {% if fuel == 'e5' %}fw-bold text-success{% endif %}">
-                    {% if p.e5 %}{{ "%.3f"|format(p.e5) }} €{% else %}—{% endif %}
+                <td class="text-end {% if fuel == 'e5' %}fw-bold text-success{% endif %}"
+                    data-value="{{ p.e5 if p.e5 else 9999 }}">
+                    {% if p.e5 %}{{ "%.3f"|format(p.e5) }}&nbsp;€{% else %}—{% endif %}
                 </td>
-                <td class="text-end {% if fuel == 'e10' %}fw-bold text-success{% endif %}">
-                    {% if p.e10 %}{{ "%.3f"|format(p.e10) }} €{% else %}—{% endif %}
+                <td class="text-end {% if fuel == 'e10' %}fw-bold text-success{% endif %}"
+                    data-value="{{ p.e10 if p.e10 else 9999 }}">
+                    {% if p.e10 %}{{ "%.3f"|format(p.e10) }}&nbsp;€{% else %}—{% endif %}
                 </td>
                 <td>
                     <button class="btn btn-sm btn-outline-primary"

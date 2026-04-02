@@ -1,3 +1,4 @@
+import os
 from flask import Blueprint, render_template
 from app import db_service
 
@@ -37,9 +38,16 @@ def index():
             unique.append(row)
     unique.sort(key=lambda r: r.get("diesel") or 999)
 
+    search = {
+        "lat": float(os.getenv("SEARCH_LAT", "50.1109")),
+        "lng": float(os.getenv("SEARCH_LNG", "8.6821")),
+        "rad": float(os.getenv("SEARCH_RAD", "10.0")),
+    }
+
     return render_template(
         "pages/index.html",
         station_count=station_count,
         last_run=last_run,
-        cheapest=unique[:20],
+        cheapest=unique[:30],
+        search=search,
     )

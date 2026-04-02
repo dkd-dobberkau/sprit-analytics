@@ -3,54 +3,49 @@
 
 {% block content %}
 <!-- Stats -->
-<div class="row g-3 mb-4">
-    <div class="col-md-4">
-        <div class="card text-bg-primary">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <div class="text-uppercase small opacity-75">Tankstellen</div>
-                        <div class="fs-2 fw-bold">{{ station_count }}</div>
-                    </div>
-                    <i class="bi bi-fuel-pump fs-1 opacity-50"></i>
+<div class="row g-2 mb-3">
+    <div class="col-6 col-md-3">
+        <div class="card text-bg-primary stat-card">
+            <div class="card-body py-2 px-3">
+                <div class="text-uppercase small opacity-75" style="font-size:.7rem">Tankstellen</div>
+                <div class="fs-5 fw-bold">{{ station_count }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card text-bg-success stat-card">
+            <div class="card-body py-2 px-3">
+                <div class="text-uppercase small opacity-75" style="font-size:.7rem">Letzter Lauf</div>
+                <div class="fs-5 fw-bold">
+                    {% if last_run %}{{ last_run.events_written }} <span class="fw-normal" style="font-size:.75rem">Events</span>{% else %}—{% endif %}
                 </div>
             </div>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card text-bg-success">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <div class="text-uppercase small opacity-75">Letzter Durchlauf</div>
-                        <div class="fs-2 fw-bold">
-                            {% if last_run %}{{ last_run.events_written }}{% else %}—{% endif %}
-                        </div>
-                        <div class="small opacity-75">Events</div>
-                    </div>
-                    <i class="bi bi-arrow-repeat fs-1 opacity-50"></i>
+    <div class="col-6 col-md-3">
+        <div class="card text-bg-warning stat-card">
+            <div class="card-body py-2 px-3">
+                <div class="text-uppercase small opacity-75" style="font-size:.7rem">Status</div>
+                <div class="fs-5 fw-bold">
+                    {% if last_run and not last_run.error %}
+                        <i class="bi bi-check-circle"></i> OK
+                    {% elif last_run and last_run.error %}
+                        <i class="bi bi-exclamation-triangle"></i> Fehler
+                    {% else %}
+                        <i class="bi bi-question-circle"></i> —
+                    {% endif %}
                 </div>
             </div>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card text-bg-warning">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <div class="text-uppercase small opacity-75">Status</div>
-                        <div class="fs-4 fw-bold">
-                            {% if last_run and not last_run.error %}
-                                <i class="bi bi-check-circle"></i> OK
-                            {% elif last_run and last_run.error %}
-                                <i class="bi bi-exclamation-triangle"></i> Fehler
-                            {% else %}
-                                <i class="bi bi-question-circle"></i> Kein Lauf
-                            {% endif %}
-                        </div>
-                    </div>
-                    <i class="bi bi-activity fs-1 opacity-50"></i>
+    <div class="col-6 col-md-3">
+        <div class="card border stat-card">
+            <div class="card-body py-2 px-3">
+                <div class="text-uppercase small text-body-secondary" style="font-size:.7rem">
+                    <i class="bi bi-geo-alt"></i> Suchgebiet
                 </div>
+                <div class="fw-bold" style="font-size:.85rem">{{ search.lat }}°, {{ search.lng }}°</div>
+                <div class="text-body-secondary" style="font-size:.75rem">Radius {{ search.rad }} km</div>
             </div>
         </div>
     </div>

@@ -7,12 +7,19 @@
 .htmx-swapping { opacity: 0; transition: opacity 0.15s ease-out; }
 .htmx-settling { opacity: 1; transition: opacity 0.15s ease-in; }
 
-/* Price highlight on cheapest row */
-.table tbody tr:first-child .text-success { font-size: 1.1em; }
+/* Stat cards compact */
+.stat-card { transition: transform 0.15s ease; }
+.stat-card:hover { transform: translateY(-1px); }
 
-/* Card hover */
-.card { transition: transform 0.15s ease; }
-.card:hover { transform: translateY(-2px); }
+/* Sortable table headers */
+th.sortable { cursor: pointer; user-select: none; white-space: nowrap; }
+th.sortable:hover { background-color: rgba(0,0,0,.05); }
+[data-bs-theme="dark"] th.sortable:hover { background-color: rgba(255,255,255,.05); }
+.sort-icon { font-size: .7rem; opacity: .4; margin-left: .25rem; }
+th.sortable[data-dir] .sort-icon { opacity: 1; }
 
 /* Badge in tables */
 .table .badge { font-weight: 500; min-width: 3.5rem; }
+
+/* Price highlight on cheapest row */
+.table tbody tr:first-child .text-success { font-size: 1.05em; }
