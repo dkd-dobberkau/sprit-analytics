@@ -35,7 +35,7 @@ DEFINE FIELD whole_day     ON station TYPE option<bool>;
 DEFINE FIELD state         ON station TYPE option<string>;
 DEFINE FIELD opening_times ON station TYPE option<array>;
 DEFINE FIELD overrides     ON station TYPE option<array>;
-DEFINE FIELD updated_at    ON station TYPE datetime  VALUE time::now();
+DEFINE FIELD updated_at    ON station TYPE datetime  DEFAULT time::now();
 
 -- Geo-Index für räumliche Abfragen
 DEFINE INDEX station_geo ON station FIELDS lat, lng;
@@ -54,7 +54,7 @@ DEFINE TABLE price_event SCHEMAFULL
         FOR update, delete NONE;
 
 DEFINE FIELD station      ON price_event TYPE record<station>;  -- Relation zur Tankstelle
-DEFINE FIELD fetched_at   ON price_event TYPE datetime  VALUE time::now();
+DEFINE FIELD fetched_at   ON price_event TYPE datetime  DEFAULT time::now();
 DEFINE FIELD status       ON price_event TYPE string;           -- "open" | "closed" | "no prices"
 DEFINE FIELD e5           ON price_event TYPE option<float>;    -- null wenn Sorte nicht geführt
 DEFINE FIELD e10          ON price_event TYPE option<float>;
@@ -71,15 +71,14 @@ DEFINE INDEX price_event_station_time ON price_event FIELDS station, fetched_at;
 -- Für Debugging und Rate-Limit-Tracking.
 
 DEFINE TABLE collector_run SCHEMAFULL
-    PERMISSIONS
-        FOR select, create FULL
-        FOR update, delete NONE;
+    PERMISSIONS FULL;
 
-DEFINE FIELD started_at      ON collector_run TYPE datetime VALUE time::now();
+DEFINE FIELD started_at      ON collector_run TYPE datetime;
 DEFINE FIELD finished_at     ON collector_run TYPE option<datetime>;
 DEFINE FIELD stations_seen   ON collector_run TYPE option<int>;
 DEFINE FIELD events_written  ON collector_run TYPE option<int>;
 DEFINE FIELD lat             ON collector_run TYPE float;
 DEFINE FIELD lng             ON collector_run TYPE float;
 DEFINE FIELD radius_km       ON collector_run TYPE float;
+DEFINE FIELD duration_s      ON collector_run TYPE option<float>;
 DEFINE FIELD error           ON collector_run TYPE option<string>;

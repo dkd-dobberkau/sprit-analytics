@@ -82,7 +82,7 @@ def station_history(station_id):
 @bp.route("/collector/runs")
 def collector_runs():
     runs = db_service.query("""
-        SELECT started_at, finished_at, stations_seen, events_written, error
+        SELECT started_at, finished_at, duration_s, stations_seen, events_written, error
         FROM collector_run
         ORDER BY started_at DESC
         LIMIT 20

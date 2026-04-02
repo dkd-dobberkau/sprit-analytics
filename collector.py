@@ -264,15 +264,15 @@ async def run_collection():
     finally:
         # ── Schritt 4: Run-Log abschließen ────────────────────────────────
         finished_at = datetime.now(timezone.utc)
+        duration = (finished_at - started_at).total_seconds()
         if run_id:
             await db.merge(run_id, {
                 "finished_at":    finished_at,
+                "duration_s":     round(duration, 1),
                 "stations_seen":  stations_seen,
                 "events_written": events_written,
                 "error":          error_msg,
             })
-
-    duration = (finished_at - started_at).total_seconds()
     log.info(f"Durchlauf abgeschlossen in {duration:.1f}s — {events_written} Events")
 
     return events_written
